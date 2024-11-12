@@ -122,12 +122,13 @@ class DiffWalker:
             if len(line) == 0:
                 continue
 
-            if line[0] == "-":
-                returned_value = self.walk(line[1:], LineDiffType.removal)
-            elif line[0] == "+":
-                returned_value = self.walk(line[1:], LineDiffType.addition)
-            else:
-                returned_value = self.walk(None, LineDiffType.nothing)
+            match(line[0]):
+                case "-":
+                    returned_value = self.walk(line[1:], LineDiffType.removal)
+                case "+":
+                    returned_value = self.walk(line[1:], LineDiffType.addition)
+                case _:
+                    returned_value = self.walk(None, LineDiffType.nothing)
 
             if returned_value == -1:
                 break
@@ -139,16 +140,16 @@ class HeaderDiffWalker(DiffWalker):
         self.added_lines = []
 
     def walk(self, line, line_diff_type):
-        if line_diff_type == LineDiffType.removal:
-            self.removed_lines.append(line)
-        elif line_diff_type == LineDiffType.nothing:
-            return -1  # break
-        else:
-            has_header_ended = line.startswith("    <")
-            if has_header_ended:
-                return -1  # break
-
-            self.added_lines.append(line)
+        match(line_diff_type):
+            case LineDiffType.removal:
+                self.removed_lines.append(line)
+            case LineDiffType.nothing:
+                return -1
+            case _:
+                has_header_ended = line.startswith("    <")
+                if has_header_ended:
+                    return -1  # break
+                self.added_lines.append(line)
 
 
 class UnwantedIdsDiffWalker(DiffWalker):
