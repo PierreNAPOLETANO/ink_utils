@@ -158,10 +158,8 @@ def manage_projects(args):
 
 
 def open_settings(args):
-    if args.folder:
-        subprocess.run(['open', config.script_folder], check=True)
-    else:
-        subprocess.run(['open', '-t', config.config_file], check=True)
+    folder_option = ['open', config.script_folder] if args.folder else ['open', '-t', config.config_file]
+    subprocess.run(folder_option, check=True)
 
 
 def manually_install_apk(args):
@@ -271,7 +269,6 @@ def force_airplane_off(args):
 
 def force_airplane_toggle(args):
     device_id = select_device()
-
     result = adb('shell cmd connectivity airplane-mode', device_id).stdout.strip()
     is_airplane_enabled = result == "enabled"
     next_state = "disable" if is_airplane_enabled else "enable"

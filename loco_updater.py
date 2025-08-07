@@ -75,11 +75,7 @@ def list_tags(loco_key):
     api_url = "https://localise.biz/api/tags"
     headers = {"Authorization": f"Loco {loco_key}"}
     response = requests.get(api_url, headers=headers)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response.json() if response.status_code == 200 else None
 
 
 def download_zip(android_tag, loco_key, tags_to_filter_out):
