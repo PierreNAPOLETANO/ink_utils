@@ -54,10 +54,11 @@ def copy_last_video(args):
         destination = "./"
 
     movie_dir = "storage/emulated/0/Movies/"
-    filename = adb("shell ls -tp " + movie_dir + " | grep -v /$ | head -1", device_id).stdout.strip()
+
+    filename = adb(f"shell ls -tp {movie_dir} | grep -v /$ | head -1", device_id).stdout.strip()
     file = movie_dir + filename
-    adb("pull " + file + " " + destination, device_id)
-    print("Pulled " + filename + " successfully")
+    adb(f"pull {file} {destination}", device_id)
+    print(f"Pulled {filename} successfully")
 
     if args.open:
         subprocess.Popen(("open", destination + filename), cwd=None)

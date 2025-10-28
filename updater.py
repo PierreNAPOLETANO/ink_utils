@@ -6,7 +6,7 @@ from datetime import datetime
 from print_utils import rainbow_print, color, Colors
 from utils import ink_folder
 
-cache_file = ink_folder + "/updater_cache"
+cache_file = f"{ink_folder}/updater_cache"
 
 update_cmd = "update"
 
@@ -63,11 +63,7 @@ def check_for_updates(raw_args):
         return
 
     if does_current_branch_target_main():
-        if is_cache_outdated():
-            latest_hash = get_remote_main_hash()
-        else:
-            latest_hash = read_cached_remote_hash()
-
+        latest_hash = get_remote_main_hash() if is_cache_outdated() else read_cached_remote_hash()
         current_hash = get_current_branch_hash()
 
         if current_hash != latest_hash:

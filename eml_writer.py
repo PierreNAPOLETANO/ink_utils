@@ -65,8 +65,10 @@ def new_eml(subject, sender, recipient, carbon_copy, with_date, html):
     add_field(eml, 'From', sender)
     add_field(eml, 'To', recipient)
     add_field(eml, 'Cc', carbon_copy)
+
     if with_date:
         add_field(eml, 'Date', date)
+
     part = MIMEText(html, 'html')
 
     eml.attach(part)

@@ -122,19 +122,13 @@ def list_tags(loco_key):
     api_url = "https://localise.biz/api/tags"
     headers = {"Authorization": f"Loco {loco_key}"}
     response = requests.get(api_url, headers=headers)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response.json() if response.status_code == 200 else return None
 
 
 def download_zip(main_tag, loco_key, tags_to_filter_out):
     negative_tags_query = join_to_string(tags_to_filter_out)
     zip_url = f"https://localise.biz/api/export/archive/xml.zip?format=android&filter=${main_tag}${negative_tags_query}&fallback=en&order=id&key={loco_key}"
-
-    archive_path = cwd + "/" + archive_name
-
+    archive_path = f"{cwd}/{archive_name}"
     response = requests.get(zip_url)
 
     if response.status_code != 200:
@@ -301,12 +295,13 @@ class DiffWalker:
             if len(line) == 0:
                 continue
 
-            if line[0] == "-":
-                returned_value = self.walk(line[1:], LineDiffType.removal)
-            elif line[0] == "+":
-                returned_value = self.walk(line[1:], LineDiffType.addition)
-            else:
-                returned_value = self.walk(None, LineDiffType.nothing)
+            match line[0]:
+                case '-':
+                    returned_value = self.walk(line[1:], LineDiffType.removal)
+                case '+':
+                    returned_value = self.walk(line[1:], LineDiffType.addition)
+                case _:
+                    returned_value = self.walk(None, LineDiffType.nothing)
 
             if returned_value == -1:
                 break
@@ -318,16 +313,18 @@ class HeaderDiffWalker(DiffWalker):
         self.added_lines = []
 
     def walk(self, line, line_diff_type):
-        if line_diff_type == LineDiffType.removal:
-            self.removed_lines.append(line)
-        elif line_diff_type == LineDiffType.nothing:
-            return -1  # break
-        else:
-            has_header_ended = line.startswith("    <")
-            if has_header_ended:
-                return -1  # break
+        match line_diff_type:
+            case LineDiffType.removal:
+                self.removed_lines.append(line)
+            case LineDiffType.nothing:
+                return -1
+            case _:
+                has_header_ended = line.startswith("    <")
 
-            self.added_lines.append(line)
+                if has_header_ended:
+                    return -1
+
+                self.added_lines.append(line)
 
 
 class UnwantedIdsDiffWalker(DiffWalker):
@@ -375,7 +372,6 @@ def validate_plural(plural, language, name):
     for element in plural:
         plural_name = f"{name}-{element.get('quantity')}"
         plural_value = element.text
-
         error_count += loco_validator.validate_string(language, plural_name, plural_value)
 
     return error_count

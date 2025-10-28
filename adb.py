@@ -5,8 +5,8 @@ from utils import remove_empty_items, select_in_list, cancel_ink_command
 
 
 def adb(command_args, device_id, stderr=None):
-    command = "adb -s " + device_id + " " + command_args
-    # print("Executing command:", command)
+    command = f"adb -s {device_id} {command_args}"
+    
     return subprocess.run(command,
                           stdout=subprocess.PIPE,
                           stderr=stderr,
@@ -21,10 +21,7 @@ def select_device():
 
 
 def select_device_or_all(args):
-    if args.all_devices:
-        device_ids = get_all_devices()
-    else:
-        device_ids = [select_device()]
+    device_ids = get_all_devices() if args.all_devices else device_ids = [select_device()]
     return device_ids
 
 
